@@ -133,8 +133,9 @@ func (i *IPBlackList) List() []Item {
 }
 
 //Add 添加ip到黑名单
-func Add(ip string, t int64) error {
-	return ipblacklist.Add(ip, t)
+//blockTime 屏蔽时间,单位：秒
+func Add(ip string, blockTime int64) error {
+	return ipblacklist.Add(ip, blockTime)
 }
 
 //Del 从黑名单中删除IP
