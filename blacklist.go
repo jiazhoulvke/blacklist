@@ -21,6 +21,8 @@ type Item struct {
 	IP string
 	//EndTime unix时间戳格式的封锁结束时间,0或负数表示永久
 	EndTime int64
+	//Reason 封锁理由
+	Reason string
 }
 
 type iplist []Item
@@ -49,7 +51,7 @@ func init() {
 	ipblacklist = New()
 }
 
-//New 新的黑名单
+//New 返回一个黑名单实例
 func New() *IPBlackList {
 	l := IPBlackList{
 		data: make(map[string]Item),
@@ -92,7 +94,7 @@ func remove(slice []Item, ip string) []Item {
 
 //Add 添加IP到黑名单
 //t 表示需要封锁的秒数，0表示永久
-func (i *IPBlackList) Add(ip string, t int64) error {
+func (i *IPBlackList) Add(ip string, t int64, reason string) error {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 	if t > 0 {
@@ -101,6 +103,7 @@ func (i *IPBlackList) Add(ip string, t int64) error {
 	item := Item{
 		IP:      ip,
 		EndTime: t,
+		Reason:  reason,
 	}
 	i.data[ip] = item
 	i.list = remove(i.list, ip)
@@ -134,8 +137,9 @@ func (i *IPBlackList) List() []Item {
 
 //Add 添加ip到黑名单
 //blockTime 屏蔽时间,单位：秒
-func Add(ip string, blockTime int64) error {
-	return ipblacklist.Add(ip, blockTime)
+//reason 屏蔽理由
+func Add(ip string, blockTime int64, reason string) error {
+	return ipblacklist.Add(ip, blockTime, reason)
 }
 
 //Del 从黑名单中删除IP
